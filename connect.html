@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>晚安营地 · 连接模型</title>
+<style>
+  :root { color-scheme: dark; --ink:#f4e9d8; --dim:#9d9488; --lamp:#ffc978; --bg:#0d1220; }
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; margin: 0; }
+  body {
+    display: grid; place-items: center; padding: 24px;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #1b2740 0%, transparent 60%),
+      radial-gradient(600px 400px at 80% 110%, #241b2e 0%, transparent 60%),
+      var(--bg);
+    color: var(--ink);
+    font: 15px/1.6 "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  }
+  .card {
+    width: min(440px, 100%);
+    padding: 28px 26px 24px;
+    border-radius: 18px;
+    background: rgba(20, 26, 40, .82);
+    border: 1px solid rgba(255, 201, 120, .16);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255,255,255,.04);
+    backdrop-filter: blur(8px);
+  }
+  .lamp { width: 8px; height: 8px; border-radius: 50%; background: var(--lamp); box-shadow: 0 0 18px 4px rgba(255,201,120,.45); display: inline-block; vertical-align: 2px; margin-right: 8px; }
+  h1 { font-size: 19px; font-weight: 600; margin: 0 0 6px; letter-spacing: .02em; }
+  .sub { margin: 0 0 18px; color: var(--dim); font-size: 13px; }
+  label { font-size: 12px; color: var(--dim); display: block; margin: 12px 0 5px; }
+  input {
+    width: 100%; padding: 11px 12px; border-radius: 10px; font: inherit;
+    color: var(--ink); background: rgba(10, 14, 24, .8);
+    border: 1px solid rgba(255,255,255,.1); outline: none;
+  }
+  input:focus { border-color: rgba(255,201,120,.55); box-shadow: 0 0 0 3px rgba(255,201,120,.1); }
+  .row { display: flex; gap: 10px; margin-top: 18px; }
+  button {
+    flex: 1; padding: 11px 12px; border: 0; border-radius: 10px; cursor: pointer;
+    font: inherit; font-weight: 600;
+  }
+  button.go { color: #2a1c08; background: linear-gradient(180deg, #ffd89b, #f0b45f); }
+  button.ghost { color: var(--ink); background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); }
+  button[disabled] { opacity: .55; cursor: default; }
+  .msg { min-height: 22px; margin: 14px 0 0; font-size: 13px; color: #ffb4a8; white-space: pre-wrap; }
+  .msg.ok { color: #9fe0b6; }
+  .foot { margin-top: 14px; font-size: 12px; color: var(--dim); line-height: 1.7; }
+  .foot a { color: var(--lamp); text-decoration: none; }
+</style>
+</head>
+<body>
+<main class="card">
+  <h1><span class="lamp"></span>连接一个模型</h1>
+  <p class="sub">这台设备上没有我们的服务端。填一个 OpenAI 兼容的端点，营地就能继续说话。</p>
+
+  <label for="base">接口地址（到 /v1 为止）</label>
+  <input id="base" placeholder="https://api.openai.com/v1" autocomplete="off" spellcheck="false">
+
+  <label for="model">模型名</label>
+  <input id="model" placeholder="gpt-4o-mini / deepseek-chat" autocomplete="off" spellcheck="false">
+
+  <label for="key">API Key</label>
+  <input id="key" type="password" placeholder="sk-..." autocomplete="off" spellcheck="false">
+
+  <div class="row">
+    <button class="ghost" id="test" type="button">测试一下</button>
+    <button class="go" id="save" type="button">保存并进入</button>
+  </div>
+  <p class="msg" id="msg" role="status" aria-live="polite"></p>
+
+  <p class="foot">
+    Key 只存在这个浏览器（localStorage），不经过我们的服务器。<br>
+    端点必须允许跨域（CORS）；不支持跨域的接口，浏览器会直接拒绝。<br>
+    没填也能进营地——邻居会用内置台词陪你，只是不会真的“想”。<br>
+    <a href="./">先不连，直接进去</a>
+  </p>
+</main>
+<script src="./connect.js" defer></script>
+</body>
+</html>

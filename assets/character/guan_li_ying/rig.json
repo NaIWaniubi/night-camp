@@ -1,0 +1,324 @@
+{
+  "schema": "character-rig/3",
+  "id": "guan_li_ying",
+  "name": "管理鹰",
+  "animal": "猫头鹰",
+  "canvas": {
+    "w": 652,
+    "h": 954
+  },
+  "anchor": {
+    "x": 326,
+    "y": 953,
+    "space": "foot-center"
+  },
+  "layers": {
+    "body": {
+      "file": "body_base.png",
+      "x": 0,
+      "y": 0,
+      "w": 652,
+      "h": 954
+    },
+    "head": {
+      "file": "head.png",
+      "x": 0,
+      "y": 0,
+      "w": 652,
+      "h": 954,
+      "rest": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "parts": {
+    "eyes_half": {
+      "file": "parts/eyes_half.png",
+      "x": 99,
+      "y": 246,
+      "w": 409,
+      "h": 161,
+      "layer": 4,
+      "kind": "eye",
+      "state": "eyes_half"
+    },
+    "eyes_closed": {
+      "file": "parts/eyes_closed.png",
+      "x": 99,
+      "y": 247,
+      "w": 409,
+      "h": 160,
+      "layer": 4,
+      "kind": "eye",
+      "state": "eyes_closed"
+    },
+    "mouth_small": {
+      "file": "parts/mouth_small.png",
+      "x": 260,
+      "y": 344,
+      "w": 83,
+      "h": 94,
+      "layer": 5,
+      "kind": "mouth",
+      "state": "mouth_small"
+    },
+    "mouth_open": {
+      "file": "parts/mouth_open.png",
+      "x": 256,
+      "y": 344,
+      "w": 91,
+      "h": 116,
+      "layer": 5,
+      "kind": "mouth",
+      "state": "mouth_open"
+    },
+    "mouth_o": {
+      "file": "parts/mouth_o.png",
+      "x": 265,
+      "y": 344,
+      "w": 74,
+      "h": 111,
+      "layer": 5,
+      "kind": "mouth",
+      "state": "mouth_o"
+    }
+  },
+  "accessories": {},
+  "states": {
+    "idle": {
+      "label": "平静 / 默认",
+      "draw": []
+    },
+    "blink_half": {
+      "label": "眨眼 · 半闭",
+      "draw": [
+        "eyes_half"
+      ]
+    },
+    "blink_closed": {
+      "label": "眨眼 · 闭合",
+      "draw": [
+        "eyes_closed"
+      ]
+    },
+    "talk_small": {
+      "label": "说话 · 轻口型",
+      "draw": [
+        "mouth_small"
+      ]
+    },
+    "talk_open": {
+      "label": "说话 · 开",
+      "draw": [
+        "mouth_open"
+      ]
+    },
+    "talk_o": {
+      "label": "说话 · O 形",
+      "draw": [
+        "mouth_o"
+      ]
+    }
+  },
+  "emotions": [
+    {
+      "id": "happy",
+      "label": "开心",
+      "draw": [
+        "eyes_closed",
+        "mouth_open"
+      ],
+      "css": "happy",
+      "blush": true
+    },
+    {
+      "id": "surprised",
+      "label": "惊讶",
+      "draw": [
+        "mouth_o"
+      ],
+      "css": "surprised",
+      "blush": false
+    },
+    {
+      "id": "shy",
+      "label": "害羞",
+      "draw": [
+        "eyes_half",
+        "mouth_small"
+      ],
+      "css": "shy",
+      "blush": true
+    },
+    {
+      "id": "sleepy",
+      "label": "困倦",
+      "draw": [
+        "eyes_half"
+      ],
+      "css": "sleepy",
+      "blush": false
+    }
+  ],
+  "talk": [
+    [
+      null,
+      90
+    ],
+    [
+      "mouth_small",
+      120
+    ],
+    [
+      "mouth_open",
+      140
+    ],
+    [
+      "mouth_small",
+      80
+    ],
+    [
+      null,
+      70
+    ],
+    [
+      "mouth_o",
+      110
+    ],
+    [
+      "mouth_small",
+      90
+    ],
+    [
+      "mouth_open",
+      130
+    ],
+    [
+      null,
+      80
+    ]
+  ],
+  "features": [
+    "呼吸",
+    "眨眼",
+    "说话",
+    "情绪"
+  ],
+  "blink": {
+    "frames": [
+      [
+        "blink_half",
+        55
+      ],
+      [
+        "blink_closed",
+        95
+      ],
+      [
+        "blink_half",
+        50
+      ]
+    ],
+    "interval": [
+      2400,
+      6200
+    ],
+    "double": 0.12
+  },
+  "lip_sync": {
+    "closed": "idle",
+    "small": "talk_small",
+    "open": "talk_open",
+    "o": "talk_o",
+    "note": "由 /3 的毫秒时长翻译而来；state id 供运行时口型轴使用，原毫秒留在 lip_ms。"
+  },
+  "blush": [
+    {
+      "x": 188.6,
+      "y": 417.26,
+      "rx": 94.39500000000001,
+      "ry": 48.608000000000004
+    },
+    {
+      "x": 416.7,
+      "y": 416.26,
+      "rx": 95.025,
+      "ry": 48.608000000000004
+    }
+  ],
+  "meta": {
+    "group": "mammal",
+    "headless": true,
+    "neck_y": null,
+    "source": "抠图(10).png"
+  },
+  "display_name": "管理鹰",
+  "version": "v2",
+  "source": "抠图(10).png",
+  "body": {
+    "file": "body_base.png",
+    "label": "身体层",
+    "layer": 0,
+    "x": 0,
+    "y": 0,
+    "w": 652,
+    "h": 954
+  },
+  "sequences": {
+    "blink": {
+      "label": "眨眼",
+      "frames": [
+        {
+          "state": "blink_half",
+          "duration_ms": 55
+        },
+        {
+          "state": "blink_closed",
+          "duration_ms": 95
+        },
+        {
+          "state": "blink_half",
+          "duration_ms": 50
+        }
+      ],
+      "return_to": "idle",
+      "trigger": "random",
+      "interval_ms": [
+        2400,
+        6200
+      ],
+      "note": "连眨概率 0.12"
+    }
+  },
+  "blink_double": 0.12,
+  "lip_ms": {
+    "closed": 90,
+    "small": 120,
+    "open": 140,
+    "o": 110
+  },
+  "mask": {
+    "file": "mask.png",
+    "w": 652,
+    "h": 954
+  },
+  "side": {
+    "file": "side.png",
+    "w": 694,
+    "h": 959,
+    "label": "气质图 · 侧目",
+    "canvas": {
+      "w": 694,
+      "h": 959
+    },
+    "anchor": {
+      "x": 347,
+      "y": 959
+    }
+  },
+  "face": {
+    "x": 302.6,
+    "y": 326.6
+  }
+}

@@ -1,0 +1,391 @@
+{
+  "schema": "character-rig/3",
+  "id": "xiao_lu",
+  "name": "小鹿",
+  "animal": "鹿",
+  "canvas": {
+    "w": 639,
+    "h": 992
+  },
+  "anchor": {
+    "x": 319,
+    "y": 991,
+    "space": "foot-center"
+  },
+  "layers": {
+    "body": {
+      "file": "body_base.png",
+      "x": 0,
+      "y": 0,
+      "w": 639,
+      "h": 992
+    },
+    "head": {
+      "file": "head.png",
+      "x": 0,
+      "y": 0,
+      "w": 639,
+      "h": 509,
+      "rest": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "parts": {
+    "eyes_half": {
+      "file": "parts/eyes_half.png",
+      "x": 120,
+      "y": 285,
+      "w": 396,
+      "h": 147,
+      "layer": 4,
+      "kind": "eye",
+      "state": "eyes_half",
+      "label": "眼 · 半闭"
+    },
+    "eyes_closed": {
+      "file": "parts/eyes_closed.png",
+      "x": 120,
+      "y": 285,
+      "w": 395,
+      "h": 147,
+      "layer": 4,
+      "kind": "eye",
+      "state": "eyes_closed",
+      "label": "眼 · 闭合"
+    },
+    "eyes_blank": {
+      "file": "parts/eyes_blank.png",
+      "x": 120,
+      "y": 285,
+      "w": 395,
+      "h": 143,
+      "layer": 4,
+      "kind": "eye",
+      "state": "eyes_blank",
+      "label": "眼 · 空白"
+    },
+    "mouth_small": {
+      "file": "parts/mouth_small.png",
+      "x": 272,
+      "y": 442,
+      "w": 93,
+      "h": 50,
+      "layer": 5,
+      "kind": "mouth",
+      "state": "mouth_small",
+      "label": "嘴 · 微张"
+    },
+    "mouth_open": {
+      "file": "parts/mouth_open.png",
+      "x": 264,
+      "y": 442,
+      "w": 109,
+      "h": 78,
+      "layer": 5,
+      "kind": "mouth",
+      "state": "mouth_open",
+      "label": "嘴 · 大张"
+    },
+    "mouth_o": {
+      "file": "parts/mouth_o.png",
+      "x": 290,
+      "y": 442,
+      "w": 58,
+      "h": 59,
+      "layer": 5,
+      "kind": "mouth",
+      "state": "mouth_o",
+      "label": "嘴 · O 形"
+    }
+  },
+  "accessories": {
+    "ear_l": {
+      "file": "accessories/ear_l.png",
+      "x": 0,
+      "y": 52,
+      "w": 219,
+      "h": 237,
+      "pivot": {
+        "x": 200,
+        "y": 203
+      },
+      "z": 4,
+      "amp": 2.5,
+      "period": 4.8,
+      "phase": 0,
+      "label": "动耳"
+    },
+    "ear_r": {
+      "file": "accessories/ear_r.png",
+      "x": 421,
+      "y": 52,
+      "w": 218,
+      "h": 237,
+      "pivot": {
+        "x": 18,
+        "y": 203
+      },
+      "z": 4,
+      "amp": -2.5,
+      "period": 4.8,
+      "phase": 0.35,
+      "label": "动耳"
+    },
+    "bell": {
+      "file": "accessories/bell.png",
+      "x": 265,
+      "y": 519,
+      "w": 107,
+      "h": 147,
+      "pivot": {
+        "x": 53,
+        "y": 9
+      },
+      "z": 2,
+      "amp": 2.5,
+      "period": 3.6,
+      "phase": 0.2,
+      "label": "铃铛"
+    }
+  },
+  "states": {
+    "idle": {
+      "label": "平静 / 默认",
+      "draw": []
+    },
+    "blink_half": {
+      "label": "眨眼 · 半闭",
+      "draw": [
+        "eyes_half"
+      ]
+    },
+    "blink_closed": {
+      "label": "眨眼 · 闭合",
+      "draw": [
+        "eyes_closed"
+      ]
+    },
+    "talk_small": {
+      "label": "说话 · 轻口型",
+      "draw": [
+        "mouth_small"
+      ]
+    },
+    "talk_open": {
+      "label": "说话 · 开",
+      "draw": [
+        "mouth_open"
+      ]
+    },
+    "talk_o": {
+      "label": "说话 · O 形",
+      "draw": [
+        "mouth_o"
+      ]
+    }
+  },
+  "emotions": [
+    {
+      "id": "happy",
+      "label": "开心",
+      "draw": [
+        "eyes_closed",
+        "mouth_open"
+      ],
+      "css": "happy",
+      "blush": true
+    },
+    {
+      "id": "surprised",
+      "label": "惊讶",
+      "draw": [
+        "mouth_o"
+      ],
+      "css": "surprised",
+      "blush": false
+    },
+    {
+      "id": "shy",
+      "label": "害羞",
+      "draw": [
+        "eyes_half",
+        "mouth_small"
+      ],
+      "css": "shy",
+      "blush": true
+    },
+    {
+      "id": "sleepy",
+      "label": "困倦",
+      "draw": [
+        "eyes_half"
+      ],
+      "css": "sleepy",
+      "blush": false
+    }
+  ],
+  "talk": [
+    [
+      "mouth_closed",
+      90
+    ],
+    [
+      "mouth_small",
+      120
+    ],
+    [
+      "mouth_open",
+      140
+    ],
+    [
+      "mouth_small",
+      80
+    ],
+    [
+      "mouth_closed",
+      70
+    ],
+    [
+      "mouth_o",
+      110
+    ],
+    [
+      "mouth_small",
+      90
+    ],
+    [
+      "mouth_open",
+      130
+    ],
+    [
+      "mouth_closed",
+      80
+    ]
+  ],
+  "features": [
+    "呼吸",
+    "眨眼",
+    "说话",
+    "情绪",
+    "动耳",
+    "铃铛"
+  ],
+  "blink": {
+    "frames": [
+      [
+        "blink_half",
+        55
+      ],
+      [
+        "blink_closed",
+        95
+      ],
+      [
+        "blink_half",
+        50
+      ]
+    ],
+    "interval": [
+      2400,
+      6200
+    ],
+    "double": 0.12
+  },
+  "lip_sync": {
+    "closed": "idle",
+    "small": "talk_small",
+    "open": "talk_open",
+    "o": "talk_o",
+    "note": "由 /3 的毫秒时长翻译而来；state id 供运行时口型轴使用，原毫秒留在 lip_ms。"
+  },
+  "blush": [
+    {
+      "x": 199.9,
+      "y": 459.65999999999997,
+      "rx": 94.605,
+      "ry": 49.848000000000006
+    },
+    {
+      "x": 436.5,
+      "y": 460.065,
+      "rx": 93.24,
+      "ry": 50.282
+    }
+  ],
+  "meta": {
+    "group": "mammal",
+    "headless": false,
+    "neck_y": 485,
+    "source": "抠图(1).png"
+  },
+  "side": {
+    "file": "side.png",
+    "w": 581,
+    "h": 1016,
+    "label": "气质图 · 侧目",
+    "canvas": {
+      "w": 581,
+      "h": 1016
+    },
+    "anchor": {
+      "x": 290.5,
+      "y": 1016
+    }
+  },
+  "face": {
+    "x": 318.2,
+    "y": 367
+  },
+  "display_name": "小鹿",
+  "version": "v2",
+  "source": "抠图(1).png",
+  "body": {
+    "file": "body_base.png",
+    "label": "身体层",
+    "layer": 0,
+    "x": 0,
+    "y": 0,
+    "w": 639,
+    "h": 992
+  },
+  "sequences": {
+    "blink": {
+      "label": "眨眼",
+      "frames": [
+        {
+          "state": "blink_half",
+          "duration_ms": 55
+        },
+        {
+          "state": "blink_closed",
+          "duration_ms": 95
+        },
+        {
+          "state": "blink_half",
+          "duration_ms": 50
+        }
+      ],
+      "return_to": "idle",
+      "trigger": "random",
+      "interval_ms": [
+        2400,
+        6200
+      ],
+      "note": "连眨概率 0.12"
+    }
+  },
+  "blink_double": 0.12,
+  "lip_ms": {
+    "closed": 90,
+    "small": 120,
+    "open": 140,
+    "o": 110
+  },
+  "mask": {
+    "file": "mask.png",
+    "w": 639,
+    "h": 992
+  }
+}

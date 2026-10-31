@@ -1,0 +1,250 @@
+{
+  "schema": "character-rig/2",
+  "id": "skunk_01",
+  "display_name": "提灯兽",
+  "version": "v1",
+  "note": "部件分层。body 是全画布底图，parts 是裁到实际大小的小图，按 rig.json 里的 x/y 贴回 body 的画布坐标即可，无需再抠图或对齐。",
+  "canvas": {
+    "w": 630,
+    "h": 964
+  },
+  "anchor": {
+    "x": 286,
+    "y": 929,
+    "space": "foot-center",
+    "note": "脚底中心。正面所有状态共用，body 定位后部件自动跟着对。"
+  },
+  "body": {
+    "file": "body.png",
+    "x": 0,
+    "y": 0,
+    "w": 630,
+    "h": 964
+  },
+  "parts": {
+    "mouth_small": {
+      "file": "parts/mouth_small.png",
+      "label": "嘴 · 微张",
+      "layer": 1,
+      "x": 306,
+      "y": 457,
+      "w": 111,
+      "h": 69
+    },
+    "mouth_open": {
+      "file": "parts/mouth_open.png",
+      "label": "嘴 · 大张",
+      "layer": 1,
+      "x": 306,
+      "y": 457,
+      "w": 111,
+      "h": 73
+    },
+    "mouth_o": {
+      "file": "parts/mouth_o.png",
+      "label": "嘴 · O 形",
+      "layer": 1,
+      "x": 306,
+      "y": 457,
+      "w": 111,
+      "h": 74
+    },
+    "eyes_half": {
+      "file": "parts/eyes_half.png",
+      "label": "眼 · 半闭",
+      "layer": 2,
+      "x": 202,
+      "y": 364,
+      "w": 325,
+      "h": 140
+    },
+    "eyes_closed": {
+      "file": "parts/eyes_closed.png",
+      "label": "眼 · 闭合",
+      "layer": 2,
+      "x": 202,
+      "y": 364,
+      "w": 325,
+      "h": 140
+    }
+  },
+  "states": {
+    "idle": {
+      "label": "默认 / 聆听",
+      "expression": "睁眼 · 闭嘴",
+      "draw": []
+    },
+    "blink_half": {
+      "label": "眨眼 · 半闭",
+      "expression": "半闭眼 · 闭嘴",
+      "draw": [
+        "eyes_half"
+      ]
+    },
+    "blink_closed": {
+      "label": "眨眼 · 闭合",
+      "expression": "闭眼 · 闭嘴",
+      "draw": [
+        "eyes_closed"
+      ]
+    },
+    "mouth_small": {
+      "label": "说话 · 轻口型",
+      "expression": "睁眼 · 微张",
+      "draw": [
+        "mouth_small"
+      ]
+    },
+    "mouth_open": {
+      "label": "说话 · 主口型",
+      "expression": "睁眼 · 大张",
+      "draw": [
+        "mouth_open"
+      ]
+    },
+    "mouth_o": {
+      "label": "说话 · O 形",
+      "expression": "睁眼 · O 形",
+      "draw": [
+        "mouth_o"
+      ]
+    },
+    "sleepy": {
+      "label": "困倦 · 半闭",
+      "expression": "半闭眼 · 微张",
+      "draw": [
+        "mouth_small",
+        "eyes_half"
+      ]
+    },
+    "happy": {
+      "label": "开心",
+      "expression": "半闭眼 · 大张",
+      "draw": [
+        "mouth_open",
+        "eyes_half"
+      ]
+    },
+    "shy": {
+      "label": "害羞",
+      "expression": "半闭眼 · 微张",
+      "draw": [
+        "mouth_small",
+        "eyes_half"
+      ]
+    }
+  },
+  "state_order": [
+    "idle",
+    "blink_half",
+    "blink_closed",
+    "mouth_small",
+    "mouth_open",
+    "mouth_o",
+    "sleepy",
+    "happy",
+    "shy"
+  ],
+  "sequences": {
+    "blink": {
+      "label": "眨眼",
+      "frames": [
+        {
+          "state": "blink_half",
+          "duration_ms": 55
+        },
+        {
+          "state": "blink_closed",
+          "duration_ms": 105
+        },
+        {
+          "state": "blink_half",
+          "duration_ms": 55
+        }
+      ],
+      "return_to": "idle",
+      "trigger": "random",
+      "interval_ms": [
+        2500,
+        6000
+      ],
+      "note": "睁眼即 idle，序列首尾不用另放帧。"
+    },
+    "side_to_front": {
+      "label": "侧目 → 正面",
+      "frames": [
+        {
+          "state": "side_notice",
+          "duration_ms": 400
+        },
+        {
+          "state": "idle",
+          "duration_ms": 0
+        }
+      ],
+      "crossfade_ms": 150,
+      "note": "侧目画布宽度与正面不同，按各自 anchor 对齐地面后交叉淡入。"
+    }
+  },
+  "side": {
+    "file": "side.png",
+    "canvas": {
+      "w": 661,
+      "h": 964
+    },
+    "anchor": {
+      "x": 331,
+      "y": 964
+    },
+    "label": "侧目 · 短状态",
+    "note": "单张，无部件、无动效，停留很短即切正面。"
+  },
+  "lip_sync": {
+    "closed": "idle",
+    "small": "mouth_small",
+    "open": "mouth_open",
+    "o": "mouth_o",
+    "note": "按音素直接取 state，不需要做口型识别。"
+  },
+  "presets": {
+    "listening": "idle",
+    "blink": "@blink",
+    "sleepy": "sleepy",
+    "happy": "happy",
+    "shy": "shy",
+    "side_notice": "side_notice",
+    "note": "@ 表示引用 sequences。"
+  },
+  "regions": {
+    "eyes_left": {
+      "x": 232,
+      "y": 391,
+      "w": 89,
+      "h": 83
+    },
+    "eyes_right": {
+      "x": 409,
+      "y": 392,
+      "w": 88,
+      "h": 84
+    },
+    "mouth": {
+      "x": 314,
+      "y": 466,
+      "w": 94,
+      "h": 58
+    },
+    "note": "正面画布坐标下的变化区包围盒，用于特写、局部重绘、点击热区。"
+  },
+  "missing": [
+    "front_mouth__wide（源表情条只有 小/大/O 三档，无真正中张，故无大张独立图）",
+    "front_blush__soft（腮红已烘焙在底图与嘴补丁里，无法单独切出）"
+  ],
+  "source": "两个角色.zip（2560×1440 拼版）",
+  "mask": {
+    "file": "mask.png",
+    "w": 630,
+    "h": 964
+  },
+  "accessories": {}
+}

@@ -1,0 +1,321 @@
+{
+  "schema": "character-rig/3",
+  "id": "he_ge",
+  "name": "鹤哥",
+  "animal": "丹顶鹤",
+  "canvas": {
+    "w": 474,
+    "h": 1275
+  },
+  "anchor": {
+    "x": 237,
+    "y": 1274,
+    "space": "foot-center"
+  },
+  "layers": {
+    "body": {
+      "file": "body_base.png",
+      "x": 0,
+      "y": 0,
+      "w": 474,
+      "h": 1275
+    },
+    "head": {
+      "file": "head.png",
+      "x": 50,
+      "y": 0,
+      "w": 392,
+      "h": 544,
+      "rest": {
+        "x": 50,
+        "y": 0
+      }
+    }
+  },
+  "parts": {
+    "eyes_half": {
+      "file": "parts/eyes_half.png",
+      "x": 79,
+      "y": 216,
+      "w": 334,
+      "h": 157,
+      "layer": 4,
+      "kind": "eye",
+      "state": "eyes_half"
+    },
+    "eyes_closed": {
+      "file": "parts/eyes_closed.png",
+      "x": 78,
+      "y": 216,
+      "w": 334,
+      "h": 156,
+      "layer": 4,
+      "kind": "eye",
+      "state": "eyes_closed"
+    },
+    "mouth_small": {
+      "file": "parts/mouth_small.png",
+      "x": 195,
+      "y": 306,
+      "w": 104,
+      "h": 186,
+      "layer": 5,
+      "kind": "mouth",
+      "state": "mouth_small"
+    },
+    "mouth_open": {
+      "file": "parts/mouth_open.png",
+      "x": 195,
+      "y": 306,
+      "w": 104,
+      "h": 186,
+      "layer": 5,
+      "kind": "mouth",
+      "state": "mouth_small"
+    },
+    "mouth_o": {
+      "file": "parts/mouth_o.png",
+      "x": 212,
+      "y": 312,
+      "w": 70,
+      "h": 157,
+      "layer": 5,
+      "kind": "mouth",
+      "state": "mouth_o"
+    }
+  },
+  "accessories": {
+    "scarf_tail": {
+      "file": "accessories/scarf_tail.png",
+      "x": 46,
+      "y": 542,
+      "w": 148,
+      "h": 114,
+      "pivot": {
+        "x": 134,
+        "y": 53
+      },
+      "z": 2,
+      "amp": 3,
+      "period": 4.2,
+      "phase": 0.1,
+      "label": "围巾"
+    }
+  },
+  "states": {
+    "idle": {
+      "label": "平静 / 默认",
+      "draw": []
+    },
+    "blink_half": {
+      "label": "眨眼 · 半闭",
+      "draw": [
+        "eyes_half"
+      ]
+    },
+    "blink_closed": {
+      "label": "眨眼 · 闭合",
+      "draw": [
+        "eyes_closed"
+      ]
+    },
+    "talk_small": {
+      "label": "说话 · 轻口型",
+      "draw": [
+        "mouth_small"
+      ]
+    },
+    "talk_open": {
+      "label": "说话 · 开",
+      "draw": [
+        "mouth_open"
+      ]
+    },
+    "talk_o": {
+      "label": "说话 · O 形",
+      "draw": [
+        "mouth_o"
+      ]
+    }
+  },
+  "emotions": [
+    {
+      "id": "happy",
+      "label": "开心",
+      "draw": [
+        "eyes_closed",
+        "mouth_open"
+      ],
+      "css": "happy",
+      "blush": true
+    },
+    {
+      "id": "surprised",
+      "label": "惊讶",
+      "draw": [
+        "mouth_o"
+      ],
+      "css": "surprised",
+      "blush": false
+    },
+    {
+      "id": "shy",
+      "label": "害羞",
+      "draw": [
+        "eyes_half",
+        "mouth_small"
+      ],
+      "css": "shy",
+      "blush": true
+    },
+    {
+      "id": "sleepy",
+      "label": "困倦",
+      "draw": [
+        "eyes_half"
+      ],
+      "css": "sleepy",
+      "blush": false
+    }
+  ],
+  "talk": [
+    [
+      null,
+      120
+    ],
+    [
+      "mouth_small",
+      130
+    ],
+    [
+      "mouth_o",
+      120
+    ],
+    [
+      "mouth_small",
+      110
+    ]
+  ],
+  "features": [
+    "呼吸",
+    "眨眼",
+    "说话",
+    "情绪",
+    "围巾"
+  ],
+  "blink": {
+    "frames": [
+      [
+        "blink_half",
+        55
+      ],
+      [
+        "blink_closed",
+        95
+      ],
+      [
+        "blink_half",
+        50
+      ]
+    ],
+    "interval": [
+      2400,
+      6200
+    ],
+    "double": 0.12
+  },
+  "lip_sync": {
+    "closed": "idle",
+    "small": "talk_small",
+    "open": "talk_open",
+    "o": "talk_o",
+    "note": "由 /3 的毫秒时长翻译而来；state id 供运行时口型轴使用，原毫秒留在 lip_ms。"
+  },
+  "blush": [
+    {
+      "x": 149,
+      "y": 389.1,
+      "rx": 77.80499999999999,
+      "ry": 50.839999999999996
+    },
+    {
+      "x": 349.5,
+      "y": 389.1,
+      "rx": 77.80499999999999,
+      "ry": 50.839999999999996
+    }
+  ],
+  "meta": {
+    "group": "bird",
+    "neck_y": 520,
+    "source": "抠图(16).png"
+  },
+  "display_name": "鹤哥",
+  "version": "v2",
+  "source": "抠图(16).png",
+  "body": {
+    "file": "body_base.png",
+    "label": "身体层",
+    "layer": 0,
+    "x": 0,
+    "y": 0,
+    "w": 474,
+    "h": 1275
+  },
+  "sequences": {
+    "blink": {
+      "label": "眨眼",
+      "frames": [
+        {
+          "state": "blink_half",
+          "duration_ms": 55
+        },
+        {
+          "state": "blink_closed",
+          "duration_ms": 95
+        },
+        {
+          "state": "blink_half",
+          "duration_ms": 50
+        }
+      ],
+      "return_to": "idle",
+      "trigger": "random",
+      "interval_ms": [
+        2400,
+        6200
+      ],
+      "note": "连眨概率 0.12"
+    }
+  },
+  "blink_double": 0.12,
+  "lip_ms": {
+    "closed": 110,
+    "small": 130,
+    "open": 130,
+    "o": 120
+  },
+  "mask": {
+    "file": "mask.png",
+    "w": 474,
+    "h": 1275
+  },
+  "side": {
+    "file": "side.png",
+    "w": 567,
+    "h": 1283,
+    "label": "气质图 · 侧目",
+    "canvas": {
+      "w": 567,
+      "h": 1283
+    },
+    "anchor": {
+      "x": 284,
+      "y": 1283
+    }
+  },
+  "face": {
+    "x": 249.2,
+    "y": 294.8
+  }
+}

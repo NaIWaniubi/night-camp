@@ -1,0 +1,22 @@
+{
+  "name": "晚安营地",
+  "short_name": "晚安营地",
+  "description": "睡不着的夜晚，住进一顶星空下的帐篷：布置它的声音，和路过的人说几句话，然后睡着。",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0b0d",
+  "theme_color": "#0f0d0a",
+  "categories": ["lifestyle", "health", "entertainment"],
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
