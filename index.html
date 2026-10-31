@@ -3760,7 +3760,7 @@ html.debug-closeup .room-chat {
   position: absolute;
   left: 16px;
   top: 156px;
-  right: 12px;
+  right: 44px;
   font-size: 10px;
   line-height: 1.4;
   color: var(--text-2);
@@ -3768,6 +3768,32 @@ html.debug-closeup .room-chat {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* 右下角的「去坐坐」：整卡都可点，但这个 › 让入口可见。
+   它不抢头像的戳脸热区，点击后直接进对话。 */
+.ncard-open {
+  position: absolute;
+  right: 10px;
+  bottom: 9px;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-2);
+  font-size: 18px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+.ncard-open:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-1);
+}
+.ncard-open:active { transform: scale(0.94); }
 
 .ncard.is-asleep {
   background: rgba(20, 26, 46, 0.34);
@@ -3785,6 +3811,7 @@ html.debug-closeup .room-chat {
 
 .ncard.is-asleep .ncard-name { color: var(--text-4); font-weight: 400; }
 .ncard.is-asleep .ncard-line { color: var(--text-4); }
+.ncard.is-asleep .ncard-open { opacity: 0.42; pointer-events: none; }
 
 @keyframes asleep-breath {
   0%, 100% { transform: scale(1); }
@@ -5227,10 +5254,15 @@ html.debug-closeup .room-chat {
 #screen-list .ncard-line {
   left: 16px;
   top: 157px;
-  right: 12px;
+  right: 44px;
   font-size: 10px;
   line-height: 1.4;
   color: var(--text-3);
+}
+
+#screen-list .ncard-open {
+  right: 10px;
+  bottom: 8px;
 }
 
 #screen-list .ncard-moon {
@@ -5268,6 +5300,11 @@ html.debug-closeup .room-chat {
 
 #screen-list .ncard.is-asleep .ncard-line {
   color: var(--text-4);
+}
+
+#screen-list .ncard.is-asleep .ncard-open {
+  opacity: 0.42;
+  pointer-events: none;
 }
 
 /* 底部入口：比卡片弱一层，随内容流排在所有卡片之后 */
@@ -31142,7 +31179,20 @@ class NeighborPage {
     const line = document.createElement('span');
     line.className = 'ncard-line';
 
-    card.append(avatarBlock, name, line);
+    // 卡片本身就是入口，但「能点」不等于「看得出能点」。
+    // 右下角给一个明确的 ›，点它和点卡片一样进对话；头像区域仍然只负责戳脸。
+    const open = document.createElement('button');
+    open.type = 'button';
+    open.className = 'ncard-open';
+    open.dataset.testid = 't-neighbor-open';
+    open.setAttribute('aria-label', `去${row.name}那儿坐坐`);
+    open.textContent = '›';
+    open.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      this.handlers.onOpen(row.id);
+    });
+
+    card.append(avatarBlock, name, line, open);
     avatarBlock.addEventListener('click', (ev) => {
       ev.stopPropagation();
       // 不能在闭包里用创建时那份 row：卡片会原地复用，邻居从「出门」
@@ -47721,6 +47771,7 @@ const { LocalMemoryStore, MEMORY_KEY_BASE } = __req("web/store.ts");
 const { currentUserId, migrateUserNamespace, userScopedKey } = __req("web/identity.ts");
 const { STICKERS, markUsed } = __req("web/stickers.ts");
 const { bootLlm, diagLlm, optimisticBoot, statusNow } = __req("web/llm.ts");
+const { isStaticHost } = __req("web/api-config.ts");
 const { createDoorstepScene } = __req("web/scene3d.ts");
 const { waitForThree } = __req("web/three.ts");
 const { createRoomSessions } = __req("web/room-session.ts");
@@ -47894,7 +47945,8 @@ function hueOf(index        )         {
 }
 
 function localSources() {
-  const viaServer = location.protocol !== 'file:';
+  // 静态托管没有 /media 路由：直接读同目录下的 audio/<id>.mp3（build-pages 会复制过去）
+  const viaServer = location.protocol !== 'file:' && !isStaticHost();
   return SOUND_SOURCES.map((s) => ({
     ...s,
     asset: new URL(viaServer ? `./media/${s.id}` : `./audio/${s.id}.mp3`, location.href).href,
