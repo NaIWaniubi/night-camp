@@ -69,10 +69,14 @@
     <button class="ghost" id="test" type="button">测试一下</button>
     <button class="go" id="save" type="button">保存并进入</button>
   </div>
+  <div class="row">
+    <button class="ghost" id="clear" type="button">清除已保存的 Key</button>
+  </div>
   <p class="msg" id="msg" role="status" aria-live="polite"></p>
 
   <p class="foot">
-    Key 只存在这个浏览器（localStorage），不经过我们的服务器。<br>
+    Key 以<b>明文</b>存在这台设备的浏览器里（localStorage），不经过我们的服务器；
+    能在这台设备打开本页的人都能看到它。卸载或清除站点数据会丢。请用只给本产品的小额 Key。<br>
     端点必须允许跨域（CORS）；不支持跨域的接口，浏览器会直接拒绝。<br>
     没填也能进营地——邻居会用内置台词陪你，只是不会真的“想”。<br>
     <a href="./">先不连，直接进去</a>

@@ -26,6 +26,11 @@
     try {
       var url = new URL(value);
       if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';
+      // Key 会随请求发出去：公网必须 https，只有本机回环可以用 http。
+      if (url.protocol === 'http:') {
+        var host = url.hostname.toLowerCase();
+        if (host !== 'localhost' && host !== '127.0.0.1' && host !== '::1' && host !== '[::1]') return '';
+      }
       return value;
     } catch (e) {
       return '';
@@ -55,9 +60,10 @@
 
   function collect() {
     var url = normalizeBase(base.value);
-    var m = String(model.value || '').trim();
-    var k = String(key.value || '').trim();
-    if (!url) return { error: '接口地址要以 http(s):// 开头，并且能解析。' };
+    // 与 web/api-config.ts 的 normalizeApiConfig 同一套截断：model 80 / key 400
+    var m = String(model.value || '').trim().slice(0, 80);
+    var k = String(key.value || '').trim().slice(0, 400);
+    if (!url) return { error: '公网地址必须用 https；只有本机 127.0.0.1 / localhost 可以用 http。' };
     if (!m) return { error: '模型名不能为空。' };
     if (!k) return { error: 'API Key 不能为空。' };
     return { cfg: { baseUrl: url, model: m, key: k } };
@@ -124,6 +130,22 @@
       say('存不进去（可能是隐私模式）。', false);
     }
   });
+
+  // 清除已保存的 Key：明文存本机，必须给用户一个明确的撤销入口
+  var btnClear = document.getElementById('clear');
+  if (btnClear) {
+    btnClear.addEventListener('click', function () {
+      try {
+        localStorage.removeItem(KEY);
+        base.value = '';
+        model.value = '';
+        key.value = '';
+        say('已清除这台设备上保存的 Key。', true);
+      } catch (e) {
+        say('清不掉（可能是隐私模式）。', false);
+      }
+    });
+  }
 
   fill();
 })();

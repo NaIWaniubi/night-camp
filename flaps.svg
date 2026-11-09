@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 932" preserveAspectRatio="xMidYMid slice">
+  <!--
+    帐篷门口的布帘。这张 SVG 自己画布（不再只当 mask 用）：
+    - 开口是不对称的：左沿 9%、右沿 88%、顶点 58%、上沿 12%、下沿 74%
+    - 软边 stdDeviation 从 16 收到 7，边缘不再是一圈 30–70px 的均匀雾
+    - 内沿是一圈 rgba(0,0,0,0.55) 的折边，再压一条 1.2px 的暖色内缘高光
+    - preserveAspectRatio="slice"：任何比例下等比裁切，不会被拉变形
+    布纹与内衬暖光由 ui.css 的 .flaps::before / ::after 叠（CSS 渐变 + 同一张 SVG 做遮罩）。
+  -->
+  <defs>
+    <linearGradient id="cloth" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b0910"/>
+      <stop offset="0.5" stop-color="#09070d"/>
+      <stop offset="1" stop-color="#0b0908"/>
+    </linearGradient>
+    <filter id="soft" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <filter id="rimBlur" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="1.2"/>
+    </filter>
+    <filter id="warmBlur" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="0.7"/>
+    </filter>
+    <mask id="opening" maskUnits="userSpaceOnUse" x="0" y="0" width="430" height="932">
+      <rect x="0" y="0" width="430" height="932" fill="#ffffff"/>
+      <path fill="#000000" filter="url(#soft)"
+        d="M38.7 689.7 V330 C40 214 138 111.8 249.4 111.8 C330 111.8 378.4 214 378.4 330 V689.7 Z"/>
+    </mask>
+  </defs>
+
+  <rect x="0" y="0" width="430" height="932" fill="url(#cloth)" mask="url(#opening)"/>
+
+  <!-- 内沿折边：压住软边，让开口有一圈布被灯烤黑的折边 -->
+  <path fill="none" stroke="rgba(0,0,0,0.55)" stroke-width="4" filter="url(#rimBlur)"
+    d="M38.7 689.7 V330 C40 214 138 111.8 249.4 111.8 C330 111.8 378.4 214 378.4 330 V689.7"/>
+
+  <!-- 暖色内缘高光：紧贴布边的一线灯色，把纯黑描边从"洞"拉回"布的内侧" -->
+  <path fill="none" stroke="rgba(255,176,120,0.30)" stroke-width="1.2" filter="url(#warmBlur)"
+    d="M38.7 689.7 V330 C40 214 138 111.8 249.4 111.8 C330 111.8 378.4 214 378.4 330 V689.7"/>
+</svg>

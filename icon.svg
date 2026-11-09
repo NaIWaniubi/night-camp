@@ -1,52 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="晚安营地">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#0d1526"/>
-      <stop offset="0.55" stop-color="#132a22"/>
-      <stop offset="1" stop-color="#1d3326"/>
+      <stop offset="0" stop-color="#101a30"/>
+      <stop offset="0.6" stop-color="#14251f"/>
+      <stop offset="1" stop-color="#0e1a14"/>
     </linearGradient>
-    <radialGradient id="lamp" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#ffe6b0" stop-opacity="0.95"/>
-      <stop offset="0.55" stop-color="#e8b96a" stop-opacity="0.42"/>
-      <stop offset="1" stop-color="#e8b96a" stop-opacity="0"/>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f2b36b" stop-opacity="0.55"/>
+      <stop offset="0.6" stop-color="#e8a35a" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#e8a35a" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="tent" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c9a86a"/>
-      <stop offset="1" stop-color="#8a6b3c"/>
+    <linearGradient id="canvas" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7e9c9"/>
+      <stop offset="1" stop-color="#e6c489"/>
     </linearGradient>
   </defs>
 
-  <rect width="512" height="512" rx="108" fill="url(#sky)"/>
+  <rect width="512" height="512" rx="112" fill="url(#sky)"/>
 
-  <!-- 夜空星星 -->
-  <g fill="#ffeec6">
-    <circle cx="120" cy="118" r="3.5" opacity="0.9"/>
-    <circle cx="196" cy="86" r="2.2" opacity="0.7"/>
-    <circle cx="268" cy="132" r="2.8" opacity="0.8"/>
-    <circle cx="340" cy="96" r="2" opacity="0.6"/>
-    <circle cx="392" cy="150" r="2.6" opacity="0.75"/>
-    <circle cx="96" cy="196" r="2" opacity="0.55"/>
-    <circle cx="164" cy="170" r="1.8" opacity="0.5"/>
-    <circle cx="300" cy="196" r="1.8" opacity="0.5"/>
-    <circle cx="420" cy="214" r="2.2" opacity="0.6"/>
+  <!-- 星（少量、大小不一，32px 也数得清） -->
+  <g fill="#f5e6c8">
+    <circle cx="118" cy="120" r="6" opacity="0.9"/>
+    <circle cx="196" cy="84" r="4" opacity="0.65"/>
+    <circle cx="286" cy="122" r="4.6" opacity="0.75"/>
+    <circle cx="96" cy="206" r="4" opacity="0.55"/>
+    <circle cx="414" cy="220" r="4.4" opacity="0.6"/>
   </g>
+  <path d="M150 158 l7 19 l19 6 l-19 7 l-7 19 l-6 -19 l-20 -7 l20 -6 Z" fill="#f2d38b" opacity="0.9"/>
 
-  <!-- 月亮 -->
-  <circle cx="376" cy="126" r="34" fill="#f0e2b8" opacity="0.94"/>
-  <circle cx="392" cy="114" r="30" fill="#101a22" opacity="0.92"/>
+  <!-- 月牙（路径月牙，不用底色圆切，避免接缝） -->
+  <path d="M398 74 C364 66 328 86 318 122 C307 162 332 202 372 210 C346 192 338 156 354 126 C365 105 381 87 398 74 Z"
+        fill="#efd9a0"/>
 
-  <!-- 地平线 -->
-  <path d="M0 336 Q 128 292 256 330 T 512 318 L512 512 L0 512 Z" fill="#16281f"/>
+  <!-- 地面：一道手绘波浪 -->
+  <path d="M0 400 C 90 372 180 366 256 380 C 340 396 430 372 512 384 L512 512 L0 512 Z" fill="#12211a"/>
 
-  <!-- 暖光 -->
-  <ellipse cx="256" cy="392" rx="190" ry="86" fill="url(#lamp)"/>
+  <!-- 帐篷暖光 -->
+  <ellipse cx="256" cy="372" rx="200" ry="96" fill="url(#glow)"/>
 
-  <!-- 帐篷 -->
-  <path d="M256 268 L 372 430 L 140 430 Z" fill="url(#tent)"/>
-  <path d="M256 268 L 306 430 L 206 430 Z" fill="#1a1208" opacity="0.45"/>
-  <path d="M256 300 L 286 430 L 226 430 Z" fill="#ffdf9e" opacity="0.5"/>
-
-  <!-- 地面 -->
-  <rect x="0" y="428" width="512" height="84" fill="#0e1a14"/>
-  <path d="M0 436 Q 96 424 192 434 T 384 430 T 512 438 L512 512 L0 512 Z" fill="#12211a"/>
+  <!-- 帐篷：微歪的帆布三角 + 顶旗 -->
+  <g stroke="#43302a" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M256 146 L256 108" fill="none" stroke-width="9"/>
+    <path d="M256 108 C276 104 296 110 308 122 C296 132 276 136 256 132 Z" fill="#c96f4a" stroke-width="7"/>
+    <path d="M253 148 C262 196 304 262 360 372 C366 384 358 396 345 396 L168 396 C155 396 147 384 153 372 C205 264 246 198 253 148 Z"
+          fill="url(#canvas)" stroke-width="10"/>
+    <!-- 帐门：深色开口 + 暖光内层 -->
+    <path d="M255 232 C270 280 292 332 308 396 L204 396 C220 332 242 280 255 232 Z"
+          fill="#2a1c10" stroke-width="8"/>
+    <path d="M255 268 C265 302 278 344 288 396 L222 396 C232 344 245 302 255 268 Z"
+          fill="#f2b36b" stroke="none"/>
+  </g>
 </svg>
