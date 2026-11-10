@@ -81,12 +81,25 @@
     say('正在试……');
     var controller = new AbortController();
     var timer = setTimeout(function () { controller.abort(); }, 15000);
-    fetch(out.cfg.baseUrl + '/chat/completions', {
+    // 有自家服务端（动态站点）时走同源代理测试：浏览器不直连外部、无 CORS 要求。
+    // 判断依据：站点没有 __CAMP_STATIC__ 标记，且不是纯静态托管域名。
+    var host = location.hostname.toLowerCase();
+    var staticHost = window.__CAMP_STATIC__ === true ||
+      host.endsWith('.github.io') || host.endsWith('.pages.dev') || host.endsWith('.netlify.app');
+    var testUrl = staticHost
+      ? out.cfg.baseUrl + '/chat/completions'
+      : './api/llm/v1/chat/completions';
+    var testHeaders = { 'content-type': 'application/json' };
+    if (staticHost) {
+      testHeaders.authorization = 'Bearer ' + out.cfg.key;
+    } else {
+      testHeaders['x-byok-base'] = out.cfg.baseUrl;
+      testHeaders['x-byok-model'] = out.cfg.model;
+      testHeaders['x-byok-key'] = out.cfg.key;
+    }
+    fetch(testUrl, {
       method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        authorization: 'Bearer ' + out.cfg.key
-      },
+      headers: testHeaders,
       body: JSON.stringify({
         model: out.cfg.model,
         messages: [{ role: 'user', content: 'ping' }],

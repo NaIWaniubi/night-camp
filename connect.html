@@ -54,7 +54,7 @@
 <body>
 <main class="card">
   <h1><span class="lamp"></span>连接一个模型</h1>
-  <p class="sub">这台设备上没有我们的服务端。填一个 OpenAI 兼容的端点，营地就能继续说话。</p>
+  <p class="sub">填一个 OpenAI 兼容的端点，营地的邻居就能接着跟你说话。</p>
 
   <label for="base">接口地址（到 /v1 为止）</label>
   <input id="base" placeholder="https://api.openai.com/v1" autocomplete="off" spellcheck="false">
@@ -75,9 +75,10 @@
   <p class="msg" id="msg" role="status" aria-live="polite"></p>
 
   <p class="foot">
-    Key 以<b>明文</b>存在这台设备的浏览器里（localStorage），不经过我们的服务器；
-    能在这台设备打开本页的人都能看到它。卸载或清除站点数据会丢。请用只给本产品的小额 Key。<br>
-    端点必须允许跨域（CORS）；不支持跨域的接口，浏览器会直接拒绝。<br>
+    Key 以<b>明文</b>存在这台设备的浏览器里（localStorage），聊天时随请求交给本站服务端转发，
+    服务端不保存、不写日志；能在这台设备打开本页的人都能看到它。卸载或清除站点数据会丢。
+    请用只给本产品的小额 Key。<br>
+    动态站点由服务端转发，端点<b>不需要</b>允许跨域；纯静态托管版才需要 CORS。<br>
     没填也能进营地——邻居会用内置台词陪你，只是不会真的“想”。<br>
     <a href="./">先不连，直接进去</a>
   </p>

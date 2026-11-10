@@ -51775,8 +51775,16 @@ class AppUi {
           if (cap?.isNativePlatform?.()) {
             this.toast('没反应的话，长按图片保存', 2400);
           }
-        } catch {
-          /* 用户取消分享：保持在预览层，不报错 */
+        } catch (err) {
+          /*
+           * 这里以前是空的：用户取消分享与「真的保存失败」走同一条 catch，
+           * 于是点了没反应时，他无法判断是自己手滑还是功能坏了。
+           * AbortError 才是主动取消（navigator.share 的规范行为），其余要明说。
+           */
+          const name = (err                            )?.name ?? '';
+          if (name === 'AbortError') return; // 主动取消：什么都不做，保持预览层
+          this.toast('这张没能存下来。长按图片可以直接保存。', 3200);
+          console.warn('[postcard] 保存失败', err);
         }
       })();
     });
@@ -58423,6 +58431,73 @@ function keyOf(record                                                 )         
   return `${record.owner ?? 'user'}:${record.key ?? fallbackKey(record.content)}`;
 }
 
+/**
+ * 这台设备到底能不能存东西。
+ *
+ * 隐私模式 / 配额满时 localStorage.setItem 会抛，写进内存照样能聊，
+ * 但刷新后全没。以前这件事被四层 catch 各自吞掉（记忆、营地进度、帐篷、
+ * 设置），用户聊了一晚、看到「✦ 他还记得」的承诺，第二天什么都没了，
+ * 界面上一个字的提示都没有。现在统一记一个标记，交给设置页如实显示。
+ */
+let storageBroken = false;
+
+/** 最近一次写入是否成功；false 表示这台设备这次打开期间记不住东西 */
+function storageIsBroken()          {
+  return storageBroken;
+}
+
+/**
+ * 删除墓碑（key → 删除时间）。
+ * 与服务端 server/sync.mjs 的 memoryKey 同构：`scope|subjectId|owner:key`。
+ * 单独存一个键，跟着快照一起同步。
+ */
+const PURGED_KEY_BASE = 'starlight:purged:';
+
+function purgeKeyOf(r              )         {
+  return `${r.scope}|${r.subjectId}|${r.owner ?? 'user'}:${r.key ?? fallbackKey(r.content)}`;
+}
+
+function readPurged(storageKey        )                         {
+  try {
+    const raw = localStorage.getItem(storageKey);
+    if (!raw) return {};
+    const parsed          = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+    const out                         = {};
+    for (const [k, v] of Object.entries(parsed                           )) {
+      if (typeof k === 'string' && typeof v === 'number' && Number.isFinite(v) && v > 0) out[k] = v;
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+/** 记一批墓碑（同一 key 取更晚的时间），最多留 512 条最近的 */
+function rememberPurged(keys                   , at        , storageKey         )       {
+  const key = storageKey ?? PURGED_KEY_BASE;
+  const cur = readPurged(key);
+  for (const k of keys) {
+    if (!cur[k] || at > cur[k]) cur[k] = at;
+  }
+  const entries = Object.entries(cur).sort((a, b) => b[1] - a[1]).slice(0, 512);
+  try {
+    localStorage.setItem(key, JSON.stringify(Object.fromEntries(entries)));
+  } catch {
+    markStorageBroken();
+  }
+}
+
+/** 营地进度 / 设置写失败时也走这里：让「记不住」只有一处判断 */
+function markStorageBroken()       {
+  storageBroken = true;
+}
+
+/** 测试与「清空数据」后复位用 */
+function resetStorageBroken()       {
+  storageBroken = false;
+}
+
 function write(key        , records                )       {
   const trimmed = records
     .slice()
@@ -58430,8 +58505,11 @@ function write(key        , records                )       {
     .slice(0, MAX_RECORDS);
   try {
     localStorage.setItem(key, JSON.stringify(trimmed));
+    storageBroken = false;
   } catch {
-    // 配额满 / 隐私模式：记忆是增强项，写不进去不能影响主流程
+    // 配额满 / 隐私模式：记忆是增强项，写不进去不能影响主流程，
+    // 但要留下「记不住」的痕迹，让设置页能如实告诉用户。
+    storageBroken = true;
   }
 }
 
@@ -58578,8 +58656,18 @@ class LocalMemoryStore                        {
     write(this.key, all);
   }
 
+  /**
+   * 清空某位邻居的全部记忆，并为每条记一个墓碑。
+   *
+   * 只做 removeItem 的话，服务端那份还在：下一台设备一同步就被并集复活，
+   * 用户删了三次还在（复核实测）。墓碑 = 「这条在什么时刻被删」，
+   * 服务端合并时按 createdAt <= 墓碑时间 过滤，删掉的就不会再回来。
+   */
   async clearSubject(subjectId        )                {
-    write(this.key, read(this.key).filter((r) => r.subjectId !== subjectId));
+    const all = read(this.key);
+    const doomed = all.filter((r) => r.subjectId === subjectId);
+    write(this.key, all.filter((r) => r.subjectId !== subjectId));
+    if (doomed.length > 0) rememberPurged(doomed.map((r) => purgeKeyOf(r)), Date.now());
   }
 
   /** 供 UI 显示「记住了 N 件事」 */
@@ -58588,7 +58676,7 @@ class LocalMemoryStore                        {
   }
 }
 
-__exp({ MEMORY_KEY_BASE: MEMORY_KEY_BASE, LocalMemoryStore: LocalMemoryStore });
+__exp({ MEMORY_KEY_BASE: MEMORY_KEY_BASE, storageIsBroken: storageIsBroken, PURGED_KEY_BASE: PURGED_KEY_BASE, readPurged: readPurged, rememberPurged: rememberPurged, markStorageBroken: markStorageBroken, resetStorageBroken: resetStorageBroken, LocalMemoryStore: LocalMemoryStore });
 
 });
 __mods.set("web/sync.ts", function (__exports, __exp) {
@@ -58609,7 +58697,7 @@ __mods.set("web/sync.ts", function (__exports, __exp) {
 const { AGE_GATE_KEY } = __req("web/age-gate.ts");
 const { readCampServer } = __req("web/api-config.ts");
 const { BOND_KEY_BASE } = __req("src/camp/bond.ts");
-const { MEMORY_KEY_BASE } = __req("web/store.ts");
+const { MEMORY_KEY_BASE, PURGED_KEY_BASE } = __req("web/store.ts");
 const { POSTCARD_ACK_KEY, POSTCARD_ARCHIVE_KEY } = __req("web/postcard-archive.ts");
 const { sanitizeGuests } = __req("web/tent-seats.ts");
 
@@ -58663,6 +58751,12 @@ const CAMP_KEY_BASE = 'starlight:camp:v1';
                           
                                        
                             
+     
+                                                 
+                                           
+                             
+     
+                                  
  
 
                           
@@ -58867,7 +58961,28 @@ function collectSnapshot(storage         , userId        )               {
     postcardAcks: readAckMap(storage, scoped(POSTCARD_ACK_KEY, userId)),
     ageGate: gateRaw === 'adult' || gateRaw === 'minor' ? gateRaw : null,
     tent: readTentSnapshot(storage, userId),
+    purged: readPurgedMap(storage, scoped(PURGED_KEY_BASE, userId)),
   };
+}
+
+/**
+ * 读墓碑表；没有/坏数据返回 {}（旧设备没有这个键是正常情况）。
+ * 抽成独立函数是为了让 collectSnapshot 保持纯读取、不抛。
+ */
+function readPurgedMap(storage         , key        )                         {
+  try {
+    const raw = storage.getItem(key);
+    if (!raw) return {};
+    const parsed          = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+    const out                         = {};
+    for (const [k, v] of Object.entries(parsed                           )) {
+      if (typeof k === 'string' && typeof v === 'number' && Number.isFinite(v) && v > 0) out[k] = v;
+    }
+    return out;
+  } catch {
+    return {};
+  }
 }
 
 /**
@@ -58907,6 +59022,10 @@ function applyTent(storage         , userId        , tent              )       {
  */
 function applySnapshot(storage         , userId        , snap              )       {
   storage.setItem(scoped(MEMORY_KEY_BASE, userId), JSON.stringify(snap.memories));
+  // 服务端回写的墓碑也要落盘：否则本机下次推送又把旧键当「没删过」
+  if (snap.purged && Object.keys(snap.purged).length > 0) {
+    storage.setItem(scoped(PURGED_KEY_BASE, userId), JSON.stringify(snap.purged));
+  }
   storage.setItem(scoped(BOND_KEY_BASE, userId), JSON.stringify(snap.bonds));
   storage.setItem(APPOINTMENT_KEY, JSON.stringify(snap.appointments));
   storage.setItem(scoped(POSTCARD_ARCHIVE_KEY, userId), JSON.stringify(snap.postcards));
@@ -58963,7 +59082,18 @@ async function request   (env         , path        , init             , token  
 
                          
                                                          
-                                                    
+     
+                
+                     
+                       
+         
+                               
+                                        
+                                       
+                                          
+         
+                        
+      
 
 /** 绑定账号：注册或登录成功 → 存凭据 → 立即跑一次同步（首登迁移，协议 §5） */
 async function bindAccount(env         , input           )                       {
@@ -59018,10 +59148,17 @@ async function syncNow(env         )                       {
     );
   } catch (err) {
     const offline = !(err instanceof SyncHttpError) || err.status === 0;
+    // 401 = 会话过期或被踢：凭据还在本地，但服务端不认了
+    const expired = err instanceof SyncHttpError && err.status === 401;
     return {
       ok: false,
-      reason: offline ? '现在连不上营地，数据都在本机，恢复后自动补传' : (err         ).message,
+      reason: expired
+        ? '登录状态过期了，重新登录一次就能接着同步。本机数据都在。'
+        : offline
+          ? '现在连不上营地，数据都在本机，恢复后自动补传'
+          : (err         ).message,
       offline,
+      ...(expired ? { expired: true } : {}),
     };
   }
   if (!out.ok || !out.snapshot || !out.counts) {
@@ -59115,12 +59252,37 @@ const { isStaticHost, readApiConfig, readCampServer } = __req("web/api-config.ts
 
 /**
  * 自带模型的连接参数（BYOK）。
+ *
+ * 两条路径：
+ *   · 静态托管（__CAMP_STATIC__ / github.io / pages.dev）：浏览器直连使用者
+ *     填的端点，端点必须允许 CORS。
+ *   · 有自家服务端（本机 / 华为云 / ZCode Sites）：走同源 /api/llm/v1 代理，
+ *     把端点、模型名、Key 放在 x-byok-* 头里交给服务端转发。
+ *     这样浏览器不直连外部、没有 CORS 要求，Key 也不会写进服务端配置。
  * 没有配置时退回 APP 内置后端（__CAMP_SERVER__）；再没有才走同源 /api 代理。
- * 内置后端是我们的公网代理：Bearer 是 demo token（过门禁），model=browser
- * 让服务端用自己配的模型；x-*** 给服务端做配额分区。
  */
+function byokProxyHeaders()                         {
+  const cfg                   = readApiConfig();
+  if (!cfg || isStaticHost()) return {};
+  return {
+    'x-byok-base': cfg.baseUrl,
+    'x-byok-model': cfg.model,
+    'x-byok-key': cfg.key,
+    'x-starlight-user': safeUserId(),
+  };
+}
+
 function byokOptions()                                                                                             {
   const cfg                   = readApiConfig();
+  if (cfg && !isStaticHost()) {
+    // 同源代理：authorization 只是占位，真正的 key 在 x-byok-key 里
+    return {
+      baseUrl: new URL('/api/llm/v1', location.href).href.replace(/\/$/, ''),
+      apiKey: 'browser',
+      model: cfg.model,
+      headers: byokProxyHeaders(),
+    };
+  }
   if (cfg) return { baseUrl: cfg.baseUrl, apiKey: cfg.key, model: cfg.model, headers: {} };
   const server = readCampServer();
   if (server) {
@@ -59454,10 +59616,15 @@ function defaultChatUrl()         {
   return new URL('/api/llm/v1/chat/completions', location.href).href;
 }
 
-/** 流式请求的鉴权头：BYOK 用 Bearer key，内置后端用 Bearer demo token */
+/** 流式请求的鉴权头：BYOK 静态直连用 Bearer key；同源代理时头已经在 config.headers 里 */
 function streamAuthHeaders()                         {
   const byok = byokOptions();
-  return byok ? { authorization: `Bearer ${byok.apiKey}` } : {};
+  if (!byok) return {};
+  // 同源代理路径：baseUrl 指向本站 /api/llm/v1，authorization 只是过门禁的占位，
+  // 真正的 key 走 x-byok-key（见 byokProxyHeaders）。
+  if (byok.headers['x-byok-key']) return byok.headers;
+  if (byok.headers['x-starlight-user']) return byok.headers;
+  return { authorization: `Bearer ${byok.apiKey}` };
 }
 
 function safeUserId()         {
@@ -70078,7 +70245,7 @@ const { createAnalytics } = __req("web/analytics.ts");
 const { RETENTION_CAVEAT, formatRetentionSummary, summarizeRetention } = __req("web/analytics-report.ts");
 const { buildPostcardLayout, paintPostcard, postcardDateOf, POSTCARD_W, POSTCARD_H } = __req("web/postcard.ts");
 const { appendPostcard, clearPostcards, listPostcards, markPostcardAcked, pendingPostcardAck, POSTCARD_ACK_KEY, POSTCARD_ARCHIVE_KEY, postcardAckLine, postcardFullyAcked, postcardSummaryOf } = __req("web/postcard-archive.ts");
-const { LocalMemoryStore, MEMORY_KEY_BASE } = __req("web/store.ts");
+const { LocalMemoryStore, MEMORY_KEY_BASE, markStorageBroken: markStorageBrokenExternal, storageIsBroken } = __req("web/store.ts");
 const { currentUserId, migrateUserNamespace, userScopedKey } = __req("web/identity.ts");
 const cloudSync = __req("web/sync.ts");
 const { STICKERS, markUsed } = __req("web/stickers.ts");
@@ -70128,6 +70295,19 @@ const RUNTIME_PROBE_TIMEOUT_MS = 4_000;
  * 而 chat 路径永远传 signal（为了能掐掉在途请求），所以那个超时不会触发。
  */
 const CHAT_HARD_TIMEOUT_MS = 60_000;
+
+/**
+ * 「这台设备记不住东西」的统一出口。
+ * store.ts 里写入记忆失败会置自己的标记；营地进度和设置失败也走这里，
+ * 于是设置页能一句话说清「为什么明天回来邻居不记得你」。
+ */
+function markStorageBroken()       {
+  try {
+    markStorageBrokenExternal();
+  } catch {
+    /* store 模块不可用时不影响主流程 */
+  }
+}
 const PERSIST_HINT = '这台设备没能保存对话（可能是隐私模式）';
 
                                                                   
@@ -70232,7 +70412,8 @@ function writeTent(t            )       {
   try {
     localStorage.setItem(K_TENT, JSON.stringify(t));
   } catch {
-    /* 隐私模式 */
+    // 隐私模式 / 配额满：内存里照常能玩，但刷新就没了。交给设置页如实说明。
+    markStorageBroken();
   }
 }
 
@@ -70272,7 +70453,7 @@ function writeSettings(v             )       {
   try {
     localStorage.setItem(K_SETTINGS, JSON.stringify(v));
   } catch {
-    /* 隐私模式 */
+    markStorageBroken();
   }
 }
 
@@ -74804,7 +74985,15 @@ ${err.stack ?? ''}` : String(err);
     } catch {
       /* 统计是附加项，读不到不影响设置页 */
     }
+    /*
+     * 这台设备如果写不进存储，必须在设置页说清楚——
+     * 否则用户看到「✦ 他还记得」的承诺，第二天回来却什么都不记得，
+     * 会以为产品在骗他，而不是浏览器在限制。
+     */
     let syncLine = '这个版本是纯本地的，记忆只存在这台设备。';
+    if (storageIsBroken()) {
+      syncLine = '这台设备现在记不住东西（隐私模式或存储已满）：今晚能聊，但关掉页面就没了。';
+    }
     let syncBound = false;
     try {
       syncLine = cloudSync.statusLine(localStorage, cloudSync.defaultEnv()?.base ?? null);
@@ -74872,7 +75061,13 @@ ${err.stack ?? ''}` : String(err);
   /** 云记忆（P4）：同步结果写回设置页状态行，对账不一致如实标出来 */
   function applySyncOutcome(out                       , okVerb        )       {
     if (!out.ok) {
-      ui.updateSettings({ syncLine: `${out.reason}`, syncBound: cloudSync.readSession(localStorage) !== null });
+      /*
+       * 会话过期时不能再显示「已绑定 + 立即同步」：那会把用户送进一个
+       * 永远只回「先登录。」的死角，而界面上没有重新登录的入口。
+       * 这里把 syncBound 压回 false（界面切回登录表单），并在状态行说明原因。
+       */
+      const stillBound = out.expired ? false : cloudSync.readSession(localStorage) !== null;
+      ui.updateSettings({ syncLine: `${out.reason}`, syncBound: stillBound });
       if (!out.offline) ui.toast(out.reason, 3200);
       return;
     }
